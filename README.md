@@ -2,12 +2,12 @@
 
 # Pre-requisites
 1. JDK >= 1.8
-2. Intellij
+2. IntelliJ
 
 # Run the project
-Open the project in Intellij or Compile on terminal.
+Open the project in IntelliJ or Compile on terminal.
 
-**From Terminal**
+###### **From Terminal**
 
 From the base directory
 1. Compile the code
