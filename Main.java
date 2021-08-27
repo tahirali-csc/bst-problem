@@ -1,26 +1,52 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-        BinarySearchTree bst = new BinarySearchTree();
-        bst.insert(12);
-        bst.insert(11);
-        bst.insert(90);
-        bst.insert(82);
-        bst.insert(7);
-        bst.insert(9);
-        List<Node> deepestNodes = bst.getDeepestNodes();
-
-        if (deepestNodes != null) {
-            System.out.println("deepest node(s):");
-            deepestNodes.forEach(n -> System.out.print(n.getValue()));
-        }
+        testDeepestWithSingleValue();
+        testDeepestWithMultipleValues();
     }
+
+    //Return multiple deepest nodes at height = 3
+    private static void testDeepestWithMultipleValues() {
+        BinarySearchTree bst = new BinarySearchTree();
+        bst.insert(new int[]{12, 11, 90, 82, 7, 6, 9});
+        Result res = bst.getDeepestNodes();
+
+        if ((res != null && res.getNodes().size() == 2) &&
+                (res.getNodes().get(0).getValue() == 6 && res.getNodes().get(1).getValue() == 9)) {
+            System.out.println("PASS::" + res.toString());
+            return;
+        }
+        System.out.println("FAILED: Unable to get the expected deepest nodes");
+    }
+
+    //Return single deepest node at height = 3
+    private static void testDeepestWithSingleValue() {
+        BinarySearchTree bst = new BinarySearchTree();
+        bst.insert(new int[]{12, 11, 90, 82, 7, 9});
+        Result res = bst.getDeepestNodes();
+
+        if (res != null) {
+            if (res.getHeight() == 3 && (res.getNodes() != null && res.getNodes().size() == 1)) {
+                System.out.println("PASS::" + res.toString());
+                return;
+            }
+        }
+        System.out.println("Unable to find the expected height and deepest nodes");
+    }
+
 }
 
 class BinarySearchTree {
     private Node root;
+
+    public void insert(int[] values) {
+        for (int i : values) {
+            this.insert(i);
+        }
+    }
 
     public void insert(int value) {
         Node n = this.insertInNode(this.root, value);
@@ -47,7 +73,7 @@ class BinarySearchTree {
     }
 
 
-    public List<Node> getDeepestNodes() {
+    public Result getDeepestNodes() {
         if (root == null) {
             return null;
         }
@@ -56,6 +82,7 @@ class BinarySearchTree {
         queue.add(root);
 
         List<Node> lastLevel = null;
+        int height = -1;
         while (!queue.isEmpty()) {
             final int sz = queue.size();
 
@@ -70,9 +97,44 @@ class BinarySearchTree {
                     queue.add(n.getRight());
                 }
             }
-        }
 
-        return lastLevel;
+            ++height;
+        }
+        return new Result(lastLevel, height);
+    }
+}
+
+class Result {
+    private List<Node> nodes;
+    private int height;
+
+    public Result(List<Node> nodes, int height) {
+        this.nodes = nodes;
+        this.height = height;
+    }
+
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Height=%d", this.height));
+
+        if (this.getNodes() != null) {
+            String nodes = this.getNodes().
+                    stream().
+                    map(n -> String.valueOf(n.getValue())).
+                    collect(Collectors.joining(","));
+            sb.append(" Deepest Nodes=[" + nodes + "]");
+        }
+        return sb.toString();
+
     }
 }
 
